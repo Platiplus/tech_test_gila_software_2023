@@ -5,6 +5,8 @@ This repository holds the technical test for **Gila Software**, based on specifi
 ## TL;DR;
 Run the project with ```docker-compose up``` (Needs Docker and docker-compose installed)
 
+Open ```http://localhost:3000``` to use the application
+
 ## Design Decisions
 
 ### Backend
