@@ -1,0 +1,55 @@
+services:
+  api:
+    build:
+      dockerfile: Dockerfile
+      context: ./backend
+      target: development
+    volumes:
+      - .:/usr/src/app
+    env_file:
+    - .env
+    command: yarn start:dev
+    ports:
+      - 8080:3000
+    depends_on:
+      database:
+        condition: service_healthy
+    networks:
+      - gila
+  frontend:
+    build:
+      dockerfile: Dockerfile
+      context: ./frontend
+      target: development
+    volumes:
+      - .:/usr/src/app
+    environment:
+      REACT_APP_API_BASE_URL: "http://localhost:8080"
+    command: yarn start
+    ports:
+      - 3000:3000
+    networks:
+      - gila
+  database:
+    image: postgres
+    volumes:
+      - ./database/database-creation.sql:/docker-entrypoint-initdb.d/database-creation.sql
+      - ./database/database-seed.sql:/docker-entrypoint-initdb.d/database-seed.sql
+    environment:
+      PGUSER: "postgres"
+      POSTGRES_USER: "postgres"
+      POSTGRES_PASSWORD: "postgres"
+      POSTGRES_HOST_AUTH_METHOD: "trust"
+    ports:
+      - "5432:5432"
+    networks:
+      - gila
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+networks:
+  gila:
+    name: gila
